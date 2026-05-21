@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Skin Concern Quiz - Natspa Aesthetics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fahkwang:wght@300;400;600&family=Mulish:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --sage: #9BAE88;
+      --sage-dark: #758769;
+      --sage-pale: #EEF2EA;
+      --gold: #C5963A;
+      --gold-light: #D4A84E;
+      --text: #4C4C4C;
+      --bg: #F6F6F6;
+      --white: #ffffff;
+      --border: #E0DEDE;
+      --cc-dark: #0D1F22;
+      --cc-teal: #1A6B72;
+      --cc-muted: #8BADA8;
+    }
+
+    body {
+      font-family: 'Mulish', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Linen grain */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='linen'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23linen)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    h1, h2, h3 { font-family: 'Fahkwang', sans-serif; font-weight: 300; line-height: 1.2; }
+
+    /* CC Demo Banner */
+    .demo-banner {
+      background: var(--cc-teal);
+      color: white;
+      text-align: center;
+      padding: 10px 20px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .demo-banner a { color: rgba(255,255,255,0.75); text-decoration: none; }
+    .demo-banner a:hover { color: white; }
+
+    /* Quiz Shell */
+    .quiz-shell {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    /* Progress */
+    .progress-bar-wrap {
+      margin-bottom: 44px;
+    }
+
+    .progress-steps {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-bottom: 12px;
+    }
+
+    .progress-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      position: relative;
+    }
+
+    .progress-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      width: 100%;
+      height: 2px;
+      background: var(--border);
+      z-index: 0;
+    }
+
+    .progress-step.done:not(:last-child)::after { background: var(--sage); }
+
+    .progress-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #bbb;
+      z-index: 1;
+      transition: all 0.3s;
+    }
+
+    .progress-step.done .progress-dot {
+      background: var(--sage);
+      border-color: var(--sage);
+      color: white;
+    }
+
+    .progress-step.active .progress-dot {
+      border-color: var(--gold);
+      color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(197,150,58,0.2);
+    }
+
+    .progress-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #bbb;
+      margin-top: 6px;
+      text-align: center;
+      max-width: 56px;
+    }
+
+    .progress-step.active .progress-label,
+    .progress-step.done .progress-label { color: var(--sage-dark); }
+
+    /* Quiz steps */
+    .quiz-step { display: none; }
+    .quiz-step.active { display: block; animation: fadeIn 0.35s ease; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .step-eyebrow {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 10px;
+    }
+
+    .step-title {
+      font-size: clamp(24px, 3.5vw, 36px);
+      color: #2C2C2C;
+      margin-bottom: 12px;
+    }
+
+    .step-desc {
+      font-size: 15px;
+      font-weight: 300;
+      color: #777;
+      line-height: 1.7;
+      max-width: 540px;
+      margin-bottom: 40px;
+    }
+
+    /* STEP 1 - Welcome */
+    .welcome-grid {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 48px;
+      align-items: center;
+      margin-bottom: 48px;
+    }
+
+    .welcome-photo {
+      border-radius: 8px;
+      overflow: hidden;
+      aspect-ratio: 3/4;
+    }
+
+    .welcome-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+    }
+
+    .welcome-text {}
+
+    .welcome-quote {
+      font-style: italic;
+      font-size: 16px;
+      font-weight: 300;
+      color: var(--text);
+      line-height: 1.75;
+      border-left: 3px solid var(--gold);
+      padding-left: 20px;
+      margin-bottom: 24px;
+    }
+
+    .welcome-name {
+      font-family: 'Fahkwang', sans-serif;
+      font-size: 18px;
+      font-weight: 400;
+      color: #2C2C2C;
+    }
+
+    .welcome-role {
+      font-size: 12px;
+      color: #888;
+      font-weight: 300;
+      margin-top: 2px;
+    }
+
+    /* Option cards */
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+
+    .options-grid.two-col {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .opt-card {
+      background: white;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .opt-card:hover {
+      border-color: var(--sage);
+      box-shadow: 0 6px 24px rgba(155,174,136,0.2);
+      transform: translateY(-2px);
+    }
+
+    .opt-card.selected {
+      border-color: var(--gold);
+      box-shadow: 0 6px 24px rgba(197,150,58,0.2);
+    }
+
+    .opt-image {
+      width: 100%;
+      height: 160px;
+      overflow: hidden;
+    }
+
+    .opt-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s;
+    }
+
+    .opt-card:hover .opt-image img { transform: scale(1.04); }
+
+    .opt-body { padding: 16px; }
+
+    .opt-title {
+      font-family: 'Fahkwang', sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      color: #2C2C2C;
+      line-height: 1.35;
+    }
+
+    .opt-check {
+      display: none;
+      width: 20px;
+      height: 20px;
+      background: var(--gold);
+      border-radius: 50%;
+      align-items: center;
+      justify-content: center;
+      margin-top: 8px;
+      font-size: 11px;
+      color: white;
+    }
+
+    .opt-card.selected .opt-check { display: flex; }
+
+    /* Radio options (step 3) */
+    .radio-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .radio-opt {
+      background: white;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .radio-opt:hover {
+      border-color: var(--sage);
+      background: var(--sage-pale);
+    }
+
+    .radio-opt.selected {
+      border-color: var(--gold);
+      background: rgba(197,150,58,0.05);
+    }
+
+    .radio-circle {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+
+    .radio-opt.selected .radio-circle {
+      border-color: var(--gold);
+      background: var(--gold);
+      box-shadow: inset 0 0 0 3px white;
+    }
+
+    .radio-text {
+      font-size: 15px;
+      color: var(--text);
+    }
+
+    /* Lead capture */
+    .lead-form {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 36px;
+      margin-bottom: 24px;
+    }
+
+    .form-group { margin-bottom: 20px; }
+
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: 'Mulish', sans-serif;
+      font-size: 15px;
+      font-weight: 300;
+      color: var(--text);
+      background: var(--bg);
+      transition: border-color 0.2s;
+      outline: none;
+    }
+
+    .form-input:focus { border-color: var(--sage); background: white; }
+
+    .form-optional {
+      font-size: 11px;
+      color: #aaa;
+      font-weight: 300;
+      margin-left: 6px;
+    }
+
+    .form-privacy {
+      font-size: 12px;
+      color: #aaa;
+      line-height: 1.6;
+      text-align: center;
+      margin-top: 4px;
+    }
+
+    /* Result step */
+    .result-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 28px;
+    }
+
+    .result-card-header {
+      background: var(--sage-pale);
+      padding: 28px 32px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .result-tag {
+      display: inline-block;
+      background: var(--sage);
+      color: white;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      padding: 5px 10px;
+      border-radius: 3px;
+      margin-bottom: 12px;
+    }
+
+    .result-heading {
+      font-size: clamp(20px, 3vw, 28px);
+      color: #2C2C2C;
+      margin-bottom: 8px;
+    }
+
+    .result-subhead {
+      font-size: 14px;
+      font-weight: 300;
+      color: #777;
+    }
+
+    .result-card-body { padding: 32px; }
+
+    .result-treatments {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .result-treatment {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 16px;
+      background: var(--bg);
+      border-radius: 6px;
+    }
+
+    .result-treatment-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--sage);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 15px;
+    }
+
+    .result-treatment-name {
+      font-weight: 700;
+      font-size: 14px;
+      color: #2C2C2C;
+      margin-bottom: 3px;
+    }
+
+    .result-treatment-desc {
+      font-size: 13px;
+      font-weight: 300;
+      color: #777;
+      line-height: 1.5;
+    }
+
+    .result-cta-block {
+      background: var(--sage-pale);
+      border-radius: 8px;
+      padding: 28px;
+      text-align: center;
+    }
+
+    .result-cta-title {
+      font-family: 'Fahkwang', sans-serif;
+      font-size: 20px;
+      font-weight: 300;
+      color: #2C2C2C;
+      margin-bottom: 8px;
+    }
+
+    .result-cta-desc {
+      font-size: 14px;
+      font-weight: 300;
+      color: #777;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-block;
+      background: var(--gold);
+      color: white;
+      font-family: 'Mulish', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 14px 32px;
+      border-radius: 3px;
+      transition: background 0.2s, transform 0.15s;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+    .btn-sage {
+      background: var(--sage);
+    }
+
+    .btn-sage:hover { background: var(--sage-dark); }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+      font-size: 12px;
+      padding: 10px 20px;
+    }
+
+    .btn-ghost:hover { background: var(--bg); transform: none; }
+
+    .step-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .step-nav-left { display: flex; gap: 12px; }
+
+    /* Result states */
+    .result-path { display: none; }
+    .result-path.active { display: block; }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .welcome-grid { grid-template-columns: 1fr; }
+      .welcome-photo { aspect-ratio: 16/9; max-height: 200px; }
+      .options-grid, .options-grid.two-col { grid-template-columns: 1fr; }
+      .lead-form { padding: 24px 20px; }
+      .result-card-body { padding: 20px; }
+      .result-card-header { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="demo-banner">
+    Clinic Catalyst Demo &nbsp;&middot;&nbsp; <a href="index.html">Back to Demo Hub</a>
+  </div>
+
+  <div class="quiz-shell">
+
+    <!-- Progress -->
+    <div class="progress-bar-wrap">
+      <div class="progress-steps">
+        <div class="progress-step active" id="prog-1">
+          <div class="progress-dot">1</div>
+          <div class="progress-label">Welcome</div>
+        </div>
+        <div class="progress-step" id="prog-2">
+          <div class="progress-dot">2</div>
+          <div class="progress-label">Concern</div>
+        </div>
+        <div class="progress-step" id="prog-3">
+          <div class="progress-dot">3</div>
+          <div class="progress-label">Detail</div>
+        </div>
+        <div class="progress-step" id="prog-4">
+          <div class="progress-dot">4</div>
+          <div class="progress-label">Your Info</div>
+        </div>
+        <div class="progress-step" id="prog-5">
+          <div class="progress-dot">5</div>
+          <div class="progress-label">Your Plan</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 1: Welcome -->
+    <div class="quiz-step active" id="step-1">
+      <div class="step-eyebrow">Skin Concern Quiz</div>
+      <h1 class="step-title">Let's find your skin plan</h1>
+      <div class="welcome-grid">
+        <div class="welcome-photo">
+          <img
+            src="https://natspa.com.au/content/uploads/2019/10/22-Natspa-SAMPL-036-C5-e1700104327478.jpg"
+            alt="Rennae Irvine, Clinic Director"
+          />
+        </div>
+        <div class="welcome-text">
+          <p class="welcome-quote">
+            "In 23 years I've seen thousands of skin stories. No two are the same.
+            This short quiz helps me understand what's going on for you so we can
+            build a plan that actually addresses the real issue - not just the
+            symptom."
+          </p>
+          <div class="welcome-name">Rennae Irvine</div>
+          <div class="welcome-role">Clinic Director &amp; Senior Skin Therapist, Natspa Aesthetics</div>
+        </div>
+      </div>
+      <p class="step-desc">
+        Takes 2 minutes. Tells us everything we need to know. At the end you'll get
+        a personalised treatment recommendation from Rennae's team.
+      </p>
+      <div class="step-nav">
+        <div></div>
+        <button class="btn" onclick="nextStep(1)">Start the quiz &#8594;</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Main concern -->
+    <div class="quiz-step" id="step-2">
+      <div class="step-eyebrow">Step 2 of 5</div>
+      <h2 class="step-title">What's bothering you most about your skin right now?</h2>
+      <p class="step-desc">Choose the one that feels closest.</p>
+      <div class="options-grid" id="concern-options">
+
+        <div class="opt-card" onclick="selectConcern('dull', this)">
+          <div class="opt-image">
+            <img src="https://natspa.com.au/content/uploads/2023/12/22-Natspa-SAMPL-036-53-scaled-e1703295997870.jpg" alt="Dull or sun-damaged skin" />
+          </div>
+          <div class="opt-body">
+            <div class="opt-title">My skin looks dull, uneven, or sun-damaged</div>
+            <div class="opt-check">&#10003;</div>
+          </div>
+        </div>
+
+        <div class="opt-card" onclick="selectConcern('ageing', this)">
+          <div class="opt-image">
+            <img src="https://natspa.com.au/content/uploads/2023/12/22-Natspa-SAMPL-036-72-scaled-e1703296040499.jpg" alt="Lines and loss of firmness" />
+          </div>
+          <div class="opt-body">
+            <div class="opt-title">I'm seeing lines and sagging I didn't have before</div>
+            <div class="opt-check">&#10003;</div>
+          </div>
+        </div>
+
+        <div class="opt-card" onclick="selectConcern('sensitive', this)">
+          <div class="opt-image">
+            <img src="https://natspa.com.au/content/uploads/2023/12/22-Natspa-SAMPL-036-12-scaled-e1703296200618.jpg" alt="Sensitive or reactive skin" />
+          </div>
+          <div class="opt-body">
+            <div class="opt-title">My skin is sensitive, reactive, or breaking out</div>
+            <div class="opt-check">&#10003;</div>
+          </div>
+        </div>
+
+      </div>
+      <div class="step-nav">
+        <button class="btn btn-ghost" onclick="prevStep(2)">&#8592; Back</button>
+        <div></div>
+      </div>
+    </div>
+
+    <!-- STEP 3: Follow-up questions (conditional) -->
+    <div class="quiz-step" id="step-3">
+      <div class="step-eyebrow">Step 3 of 5</div>
+
+      <!-- PATH: DULL -->
+      <div class="result-path" id="path-dull-q">
+        <h2 class="step-title">Tell me a little more about what you're seeing</h2>
+        <p class="step-desc">Choose the option that fits best.</p>
+        <div class="radio-options">
+          <div class="radio-opt" onclick="selectRadio(this, 'dull-q')">
+            <div class="radio-circle"></div>
+            <div class="radio-text">My skin used to glow - now it looks flat and grey, especially in photos</div>
+          </div>
+          <div class="radio-opt" onclick="selectRadio(this, 'dull-q')">
+            <div class="radio-circle"></div>
+            <div class="radio-text">I have dark spots, uneven patches, or sun damage that's been building up</div>
+          </div>
+          <div class="radio-opt" onclick="selectRadio(this, 'dull-q')">
+            <div class="radio-circle"></div>
+            <div class="radio-text">My skin feels rough or congested and nothing seems to shift it</div>
+          </div>
+        </div>
+        <div class="step-nav">
+          <button class="btn btn-ghost" onclick="prevStep(3)">&#8592; Back</button>
+          <button class="btn" onclick="nextStep(3)">Continue &#8594;</button>
+        </div>
+      </div>
+
+      <!-- PATH: AGEING -->
+      <div class="result-path" id="path-ageing-q">
+        <h2 class="step-title">Tell me a little more about what you're noticing</h2>
+        <p class="step-desc">Choose the option that fits best.</p>
+        <div class="radio-options">
+          <div class="radio-opt" onclick="selectRadio(this, 'ageing-q')">
+            <div class="radio-circle"></div>
+            <div class="radio-text">Fine lines around my eyes and forehead that are getting more obvious</div>
+          </div>
+          <div class="radio-opt" onclick="selectRadio(this, 'ageing-q')">
+            <div class="radio-circle"></div>
+            <div class="radio-text">My face has lost its shape and feels less lifted than it used to</div>
+          </div>
+          <div class="radio-opt" onclick="selectRadio(this, 'ageing-q')">
+            <div class="radio-circle"></div>
+            <div class="radio-text">My skin feels thinner and I want to build it back up properly</div>
+          </div>
+        </div>
+        <div class="step-nav">
+          <button class="btn btn-ghost" onclick="prevStep(3)">&#8592; Back</button>
+          <button class="btn" onclick="nextStep(3)">Continue &#8594;</button>
+        </div>
+      </div>
+
+      <!-- PATH: SENSITIVE -->
+      <div class="result-path" id="path-sensitive-q">
+        <h2 class="step-title">Tell me a little more about what you're experiencing</h2>
+        <p class="step-desc">Choose the option that fits best.</p>
+        <div class="radio-options">
+          <div class="radio-opt" onclick="selectRadio(this, 'sensitive-q')">
+            <div class="radio-circle"></div>
+            <div class="radio-text">My skin flushes or reacts to products, temperature, or stress</div>
+          </div>
+          <div class="radio-opt" onclick="selectRadio(this, 'sensitive-q')">
+            <div class="radio-circle"></div>
+            <div class="radio-text">I keep breaking out and I've tried everything - nothing sticks</div>
+          </div>
+          <div class="radio-opt" onclick="selectRadio(this, 'sensitive-q')">
+            <div class="radio-circle"></div>
+            <div class="radio-text">I feel like the issue might be internal - gut, hormones, diet</div>
+          </div>
+        </div>
+        <div class="step-nav">
+          <button class="btn btn-ghost" onclick="prevStep(3)">&#8592; Back</button>
+          <button class="btn" onclick="nextStep(3)">Continue &#8594;</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- STEP 4: Lead capture -->
+    <div class="quiz-step" id="step-4">
+      <div class="step-eyebrow">Step 4 of 5</div>
+      <h2 class="step-title">Almost there - where should we send your skin plan?</h2>
+      <p class="step-desc">
+        Rennae's team will review your answers and send through a personalised
+        recommendation within 24 hours.
+      </p>
+      <div class="lead-form">
+        <div class="form-group">
+          <label class="form-label" for="q-name">Your first name</label>
+          <input class="form-input" type="text" id="q-name" placeholder="e.g. Sarah" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="q-email">Email address</label>
+          <input class="form-input" type="email" id="q-email" placeholder="hello@email.com" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="q-phone">
+            Phone number <span class="form-optional">(optional)</span>
+          </label>
+          <input class="form-input" type="tel" id="q-phone" placeholder="04XX XXX XXX" />
+        </div>
+        <p class="form-privacy">
+          Your details are only used to send your personalised skin plan. We don't spam.
+          You can unsubscribe any time.
+        </p>
+      </div>
+      <div class="step-nav">
+        <button class="btn btn-ghost" onclick="prevStep(4)">&#8592; Back</button>
+        <button class="btn" onclick="nextStep(4)">See my skin plan &#8594;</button>
+      </div>
+    </div>
+
+    <!-- STEP 5: Result -->
+    <div class="quiz-step" id="step-5">
+      <div class="step-eyebrow">Your Personalised Skin Plan</div>
+      <h2 class="step-title" id="result-name-heading">Here's what we recommend</h2>
+      <p class="step-desc" style="margin-bottom:28px;">
+        Based on your answers, Rennae's team has put together the following
+        starting point for your skin journey.
+      </p>
+
+      <!-- PATH DULL result -->
+      <div class="result-path" id="result-dull">
+        <div class="result-card">
+          <div class="result-card-header">
+            <div class="result-tag">Recommended Path</div>
+            <h3 class="result-heading">Resurface, brighten &amp; even your skin tone</h3>
+            <p class="result-subhead">For dull, sun-damaged, or uneven skin - a targeted brightening protocol</p>
+          </div>
+          <div class="result-card-body">
+            <div class="result-treatments">
+              <div class="result-treatment">
+                <div class="result-treatment-icon">&#9728;</div>
+                <div>
+                  <div class="result-treatment-name">IPL Photo Rejuvenation</div>
+                  <div class="result-treatment-desc">Targets sun damage, age spots, freckles, and uneven redness in as little as 1 - 3 sessions</div>
+                </div>
+              </div>
+              <div class="result-treatment">
+                <div class="result-treatment-icon">&#10024;</div>
+                <div>
+                  <div class="result-treatment-name">Professional Peel Series</div>
+                  <div class="result-treatment-desc">Resurfacing peels that lift dullness, improve texture, and restore luminosity - graduated to your skin</div>
+                </div>
+              </div>
+              <div class="result-treatment">
+                <div class="result-treatment-icon">&#9679;</div>
+                <div>
+                  <div class="result-treatment-name">Microdermabrasion + LED</div>
+                  <div class="result-treatment-desc">A quick, maintenance reset for immediate glow with zero downtime</div>
+                </div>
+              </div>
+            </div>
+            <div class="result-cta-block">
+              <div class="result-cta-title">Ready to get started?</div>
+              <p class="result-cta-desc">
+                Book a consultation with Rennae and we'll confirm which protocol
+                is right for your skin in person.
+              </p>
+              <a href="https://bookings.gettimely.com/natspaaesthetics/book" target="_blank" class="btn">Book Your Consultation</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PATH AGEING result -->
+      <div class="result-path" id="result-ageing">
+        <div class="result-card">
+          <div class="result-card-header">
+            <div class="result-tag">Recommended Path</div>
+            <h3 class="result-heading">Restore firmness, lift &amp; volume</h3>
+            <p class="result-subhead">For lines, sagging, and loss of facial structure - a clinical lift protocol</p>
+          </div>
+          <div class="result-card-body">
+            <div class="result-treatments">
+              <div class="result-treatment">
+                <div class="result-treatment-icon">&#9670;</div>
+                <div>
+                  <div class="result-treatment-name">Dermapen4 Microneedling</div>
+                  <div class="result-treatment-desc">Stimulates collagen and elastin from within - one of the most effective anti-ageing treatments available</div>
+                </div>
+              </div>
+              <div class="result-treatment">
+                <div class="result-treatment-icon">&#128207;</div>
+                <div>
+                  <div class="result-treatment-name">Dr Sean Arendse - Injectable Consultation</div>
+                  <div class="result-treatment-desc">In-depth facial assessment with Natspa's resident cosmetic physician for anti-wrinkle and volume treatment</div>
+                </div>
+              </div>
+              <div class="result-treatment">
+                <div class="result-treatment-icon">&#9651;</div>
+                <div>
+                  <div class="result-treatment-name">RF Microcurrent</div>
+                  <div class="result-treatment-desc">Lifts, tones and firms - a non-invasive option for improving skin laxity</div>
+                </div>
+              </div>
+            </div>
+            <div class="result-cta-block">
+              <div class="result-cta-title">Ready to get started?</div>
+              <p class="result-cta-desc">
+                Book a consultation and we'll assess which combination of treatments
+                will give you the best result for your concerns.
+              </p>
+              <a href="https://bookings.gettimely.com/natspaaesthetics/book" target="_blank" class="btn">Book Your Consultation</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PATH SENSITIVE result -->
+      <div class="result-path" id="result-sensitive">
+        <div class="result-card">
+          <div class="result-card-header">
+            <div class="result-tag">Recommended Path</div>
+            <h3 class="result-heading">Calm, repair &amp; rebuild your skin barrier</h3>
+            <p class="result-subhead">For sensitive, reactive, or breakout-prone skin - a holistic healing protocol</p>
+          </div>
+          <div class="result-card-body">
+            <div class="result-treatments">
+              <div class="result-treatment">
+                <div class="result-treatment-icon">&#9685;</div>
+                <div>
+                  <div class="result-treatment-name">LED Light Therapy</div>
+                  <div class="result-treatment-desc">Red and blue LED calms inflammation, kills acne bacteria, and accelerates skin healing with zero irritation</div>
+                </div>
+              </div>
+              <div class="result-treatment">
+                <div class="result-treatment-icon">&#127807;</div>
+                <div>
+                  <div class="result-treatment-name">Paul Sortino - Naturopathy Consultation</div>
+                  <div class="result-treatment-desc">When skin issues have internal roots in gut health, hormones, or stress - Paul addresses the cause, not just the symptom</div>
+                </div>
+              </div>
+              <div class="result-treatment">
+                <div class="result-treatment-icon">&#9670;</div>
+                <div>
+                  <div class="result-treatment-name">Gentle Peel + Aquadermie</div>
+                  <div class="result-treatment-desc">Sensitive-skin safe resurfacing with deep hydration - suitable even for reactive or barrier-impaired skin</div>
+                </div>
+              </div>
+            </div>
+            <div class="result-cta-block">
+              <div class="result-cta-title">Ready to get started?</div>
+              <p class="result-cta-desc">
+                Book a consultation and we'll do a full skin assessment - and if
+                needed, introduce you to Paul for the full inside-out approach.
+              </p>
+              <a href="https://bookings.gettimely.com/natspaaesthetics/book" target="_blank" class="btn">Book Your Consultation</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:center; margin-top:16px;">
+        <button class="btn btn-ghost" onclick="restartQuiz()">&#8635; Start again</button>
+      </div>
+
+    </div>
+
+  </div><!-- /quiz-shell -->
+
+  <script>
+    let currentStep = 1;
+    let selectedConcern = null;
+
+    function setProgress(step) {
+      document.querySelectorAll('.progress-step').forEach((el, i) => {
+        el.classList.remove('active', 'done');
+        if (i + 1 < step) el.classList.add('done');
+        if (i + 1 === step) el.classList.add('active');
+      });
+    }
+
+    function showStep(n) {
+      document.querySelectorAll('.quiz-step').forEach(s => s.classList.remove('active'));
+      const el = document.getElementById('step-' + n);
+      if (el) el.classList.add('active');
+      setProgress(n);
+      currentStep = n;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function nextStep(from) {
+      if (from === 2) return; // step 2 advances via card click
+      if (from === 3) {
+        showStep(4);
+        return;
+      }
+      if (from === 4) {
+        // show result
+        showResultStep();
+        return;
+      }
+      showStep(from + 1);
+    }
+
+    function prevStep(from) {
+      if (from === 3) { showStep(2); return; }
+      showStep(from - 1);
+    }
+
+    function selectConcern(type, el) {
+      // clear old selection
+      document.querySelectorAll('#concern-options .opt-card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedConcern = type;
+
+      // show correct path in step 3
+      document.querySelectorAll('#step-3 .result-path').forEach(p => p.classList.remove('active'));
+      document.getElementById('path-' + type + '-q').classList.add('active');
+
+      // brief delay then advance
+      setTimeout(() => showStep(3), 320);
+    }
+
+    function selectRadio(el, group) {
+      document.querySelectorAll('[onclick*="' + group + '"]').forEach(r => r.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+
+    function showResultStep() {
+      // Get name if entered
+      const name = document.getElementById('q-name').value.trim();
+      if (name) {
+        document.getElementById('result-name-heading').textContent = name + ', here is your personalised skin plan';
+      }
+
+      // show correct result path
+      document.querySelectorAll('#step-5 .result-path').forEach(p => p.classList.remove('active'));
+      const path = selectedConcern || 'dull';
+      document.getElementById('result-' + path).classList.add('active');
+
+      showStep(5);
+    }
+
+    function restartQuiz() {
+      selectedConcern = null;
+      document.querySelectorAll('.opt-card').forEach(c => c.classList.remove('selected'));
+      document.querySelectorAll('.radio-opt').forEach(r => r.classList.remove('selected'));
+      document.getElementById('q-name').value = '';
+      document.getElementById('q-email').value = '';
+      document.getElementById('q-phone').value = '';
+      document.getElementById('result-name-heading').textContent = "Here's what we recommend";
+      showStep(1);
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NatSpa Aesthetics - Clinic Catalyst Demo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Fahkwang:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cc-dark: #0D1F22;
+      --cc-teal: #1A6B72;
+      --cc-teal-light: #2A8C96;
+      --cc-teal-glow: rgba(26,107,114,0.35);
+      --cc-gold: #C5963A;
+      --cc-text: #E8EFED;
+      --cc-muted: #8BADA8;
+      --dot-color: rgba(26,107,114,0.18);
+    }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: var(--cc-dark);
+      color: var(--cc-text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Dot grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(circle, var(--dot-color) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* SVG noise texture overlay */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 60px 24px 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    /* CC Brand bar */
+    .cc-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 56px;
+      opacity: 0.7;
+    }
+
+    .cc-brand-logo {
+      width: 28px;
+      height: 28px;
+      background: var(--cc-teal);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cc-brand-logo svg { width: 16px; height: 16px; fill: white; }
+
+    .cc-brand-name {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--cc-muted);
+    }
+
+    /* Profile section */
+    .profile {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 48px;
+    }
+
+    .avatar-ring {
+      width: 112px;
+      height: 112px;
+      border-radius: 50%;
+      padding: 3px;
+      background: linear-gradient(135deg, var(--cc-gold) 0%, var(--cc-teal) 100%);
+      box-shadow: 0 0 32px var(--cc-teal-glow);
+      flex-shrink: 0;
+    }
+
+    .avatar-ring img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      object-position: center top;
+      display: block;
+    }
+
+    .profile-text { text-align: center; }
+
+    .clinic-name {
+      font-family: 'Fahkwang', sans-serif;
+      font-size: 32px;
+      font-weight: 300;
+      letter-spacing: 0.04em;
+      color: #ffffff;
+      line-height: 1.1;
+    }
+
+    .clinic-name span {
+      color: var(--cc-gold);
+    }
+
+    .clinic-sub {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--cc-muted);
+      margin-top: 6px;
+    }
+
+    /* Divider */
+    .divider {
+      width: 48px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--cc-teal), var(--cc-gold));
+      border-radius: 2px;
+      margin: 32px 0;
+    }
+
+    /* Intro text */
+    .intro {
+      text-align: center;
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--cc-muted);
+      max-width: 480px;
+      margin-bottom: 44px;
+    }
+
+    .intro strong { color: var(--cc-text); font-weight: 600; }
+
+    /* Nav cards */
+    .nav-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .nav-card {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 20px 24px;
+      background: rgba(26,107,114,0.08);
+      border: 1px solid rgba(26,107,114,0.25);
+      border-radius: 8px;
+      text-decoration: none;
+      color: var(--cc-text);
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .nav-card:hover {
+      background: rgba(26,107,114,0.18);
+      border-color: var(--cc-teal);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(26,107,114,0.2);
+    }
+
+    .nav-card-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 6px;
+      background: var(--cc-teal);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .nav-card-icon svg { width: 20px; height: 20px; fill: white; }
+
+    .nav-card-icon.gold { background: var(--cc-gold); }
+
+    .nav-card-body { flex: 1; }
+
+    .nav-card-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--cc-muted);
+      margin-bottom: 3px;
+    }
+
+    .nav-card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .nav-card-desc {
+      font-size: 12px;
+      color: var(--cc-muted);
+      margin-top: 2px;
+      line-height: 1.5;
+    }
+
+    .nav-card-arrow {
+      color: var(--cc-teal);
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    /* Footer */
+    .hub-footer {
+      margin-top: 64px;
+      text-align: center;
+    }
+
+    .prepared-by {
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(139,173,168,0.5);
+    }
+
+    .prepared-by a {
+      color: var(--cc-teal-light);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .prepared-by a:hover { text-decoration: underline; }
+
+    @media (max-width: 480px) {
+      .clinic-name { font-size: 26px; }
+      .nav-card { padding: 16px 18px; gap: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <div class="cc-brand">
+      <div class="cc-brand-logo">
+        <svg viewBox="0 0 16 16"><path d="M2 2h5v5H2zm7 0h5v5H9zm-7 7h5v5H2zm7 0h5v5H9z"/></svg>
+      </div>
+      <span class="cc-brand-name">Clinic Catalyst</span>
+    </div>
+
+    <div class="profile">
+      <div class="avatar-ring">
+        <img
+          src="https://natspa.com.au/content/uploads/2019/10/22-Natspa-SAMPL-036-C5-e1700104327478.jpg"
+          alt="Rennae Irvine, Clinic Director"
+        />
+      </div>
+      <div class="profile-text">
+        <div class="clinic-name"><span>Natspa</span> Aesthetics</div>
+        <div class="clinic-sub">Essendon VIC - Demo Package</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <p class="intro">
+      <strong>Hi Rennae.</strong> This is what your clinic's online presence could look like
+      - built around your real results, your 23 years of expertise, and the clients
+      already searching for you.
+    </p>
+
+    <div class="nav-cards">
+
+      <a href="homepage.html" class="nav-card">
+        <div class="nav-card-icon">
+          <svg viewBox="0 0 20 20"><path d="M10 2L2 8v10h6v-5h4v5h6V8L10 2z"/></svg>
+        </div>
+        <div class="nav-card-body">
+          <div class="nav-card-label">Page 1 of 3</div>
+          <div class="nav-card-title">Homepage Demo</div>
+          <div class="nav-card-desc">Conversion-first homepage - your expertise front and centre</div>
+        </div>
+        <div class="nav-card-arrow">&#8594;</div>
+      </a>
+
+      <a href="assessment.html" class="nav-card">
+        <div class="nav-card-icon">
+          <svg viewBox="0 0 20 20"><path d="M10 1a9 9 0 100 18A9 9 0 0010 1zm0 2a7 7 0 110 14A7 7 0 0110 3zm0 3a1 1 0 00-1 1v4a1 1 0 001 1h3a1 1 0 000-2h-2V7a1 1 0 00-1-1z"/></svg>
+        </div>
+        <div class="nav-card-body">
+          <div class="nav-card-label">Page 2 of 3</div>
+          <div class="nav-card-title">Skin Concern Quiz</div>
+          <div class="nav-card-desc">5-step interactive quiz that captures leads and books consultations</div>
+        </div>
+        <div class="nav-card-arrow">&#8594;</div>
+      </a>
+
+      <a href="roadmap.html" class="nav-card">
+        <div class="nav-card-icon gold">
+          <svg viewBox="0 0 20 20"><path d="M3 4h14v2H3zm0 5h14v2H3zm0 5h9v2H3z"/></svg>
+        </div>
+        <div class="nav-card-body">
+          <div class="nav-card-label">Page 3 of 3</div>
+          <div class="nav-card-title">Your Growth Roadmap</div>
+          <div class="nav-card-desc">The specific changes that unlock more bookings for Natspa</div>
+        </div>
+        <div class="nav-card-arrow">&#8594;</div>
+      </a>
+
+    </div>
+
+    <div class="hub-footer">
+      <p class="prepared-by">
+        Prepared by <a href="https://cliniccatalyst.com.au" target="_blank">Clinic Catalyst</a>
+        &nbsp;&middot;&nbsp; For Rennae Irvine, Natspa Aesthetics
+      </p>
+    </div>
+
+  </div>
+</body>
+</html>
